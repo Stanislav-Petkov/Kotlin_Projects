@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Multiple Lanuage</string>
+    <string name="hello">Здравей</string>
+    <string name="show_toast">Покажи съобщение</string>
+    <string name="toast">Това е съобщение!</string>
+</resources>

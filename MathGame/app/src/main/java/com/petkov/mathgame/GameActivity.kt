@@ -1,8 +1,9 @@
 package com.petkov.mathgame
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -11,7 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import org.w3c.dom.Text
+import java.util.Locale
 import kotlin.random.Random
 
 class GameActivity : AppCompatActivity() {
@@ -29,6 +30,10 @@ class GameActivity : AppCompatActivity() {
     var correctAnswer = 0
     var userScore = 0
     var userLife = 3
+
+    lateinit var timer : CountDownTimer
+    private val startTimeInMillis: Long = 20000
+    var timeLeftInMillis: Long = startTimeInMillis
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -38,6 +43,8 @@ class GameActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        supportActionBar?.title = "Addition"
 
         textScore = findViewById(R.id.textViewScore)
         textLife = findViewById(R.id.textViewLife)
@@ -59,6 +66,9 @@ class GameActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }else{
+
+                pauseTimer()
+
                 val userAnswer = input.toInt()
 
                 if(userAnswer == correctAnswer){
@@ -74,6 +84,8 @@ class GameActivity : AppCompatActivity() {
         }
 
         buttonNext.setOnClickListener {
+            pauseTimer()
+            resetTimer()
             gameContinue()
             editTextAnswer.text.clear()
         }
@@ -86,5 +98,39 @@ class GameActivity : AppCompatActivity() {
         textQuestion.text = "$number1 + $number2"
 
         correctAnswer = number1 + number2
+
+        startTimer()
+    }
+
+    fun startTimer(){
+        timer = object : CountDownTimer(timeLeftInMillis,1000){
+            override fun onTick(millisUntilFinished: Long) {
+                timeLeftInMillis = millisUntilFinished
+                updateText()
+            }
+
+            override fun onFinish() {
+                pauseTimer()
+                resetTimer()
+                updateText()
+
+                userLife--
+                textLife.text = userLife.toString()
+                textQuestion.text = "Sorry, Time us up!"
+            }
+        }.start()
+    }
+    fun updateText(){
+        val remainingTime : Int = (timeLeftInMillis / 1000).toInt()
+        textTime.text = String.format(Locale.getDefault(), "%02d", remainingTime)
+    }
+
+    fun pauseTimer(){
+        timer.cancel()
+    }
+
+    fun resetTimer(){
+        timeLeftInMillis = startTimeInMillis
+        updateText()
     }
 }
